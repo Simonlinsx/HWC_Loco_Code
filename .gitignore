@@ -1,0 +1,32 @@
+isaacgym*
+.ipynb_checkpoints/
+.vscode/
+*img
+*__pycache__*
+fbx/
+**/__pycache__/
+nohup.outnohup.out
+ASE/ase/poselib/data/retarget_npy_g1/
+
+# Generated training artifacts
+legged_gym/logs/
+wandb/
+videos/
+outputs/
+*.wandb
+*.mp4
+*.avi
+*.mov
+
+# Local motion preprocessing outputs
+ASE/ase/poselib/data/pkl/
+ASE/ase/poselib/data/pkl_old/
+ASE/ase/poselib/data/retarget_npy/
+ASE/ase/poselib/data/retarget_npy_old/
+
+# Local documents and exported checkpoints
+hwc_loco.pdf
+*.ckpt
+*.pt
+*.pth
+*.jit
