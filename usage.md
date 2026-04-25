@@ -449,14 +449,18 @@ CUDA_VISIBLE_DEVICES=1 python train.py recovery_track_cost_v34   --task h1_comma
 CUDA_VISIBLE_DEVICES=1 python train.py recovery_track_cost_v35   --task h1_command   --motion_task recovery   --motion_name motions_autogen_human_walk_and_run.yaml   --motion_type yaml   --sim_device cuda:0   --rl_device cuda:0   --seed 42   --headless   --record_checkpoint_video   --checkpoint_video_num_steps 300
 
 
-CUDA_VISIBLE_DEVICES=1 python train.py recovery_track_cost_v36   --task h1_command   --motion_task recovery   --motion_name motions_autogen_human_walk_and_run.yaml   --motion_type yaml   --sim_device cuda:0   --rl_device cuda:0   --seed 42   --headless   --record_checkpoint_video   --checkpoint_video_num_steps 300
+CUDA_VISIBLE_DEVICES=1 python train.py recovery_track_cost_v42   --task h1_command   --motion_task recovery   --motion_name motions_autogen_human_walk_and_run.yaml   --motion_type yaml   --sim_device cuda:0   --rl_device cuda:0   --seed 42   --headless   --record_checkpoint_video   --checkpoint_video_num_steps 300
 
+
+CUDA_VISIBLE_DEVICES=3 python train.py recovery_track_cost_v42_wo_zmp   --task h1_command   --motion_task recovery   --motion_name motions_autogen_human_walk_and_run.yaml   --motion_type yaml   --sim_device cuda:0   --rl_device cuda:0   --seed 42   --headless   --record_checkpoint_video   --checkpoint_video_num_steps 300
 
 
 
 
 ## Selector
 CUDA_VISIBLE_DEVICES=3 python train_selector.py selector_h1_v1   --task h1_selector   --motion_task walk   --motion_name motions_autogen_human_walk_and_run.yaml   --motion_type yaml   --sim_device cuda:0   --rl_device cuda:0   --seed 42   --proj_name h1   --loco_jit /data1/linsixu/HWC_Loco/legged_gym/logs/h1/goal_tracking/traced/goal_tracking-28000-actor_jit.pt   --reco_jit /data1/linsixu/HWC_Loco/legged_gym/logs/h1/recovery/traced/recovery-30800-actor_jit.pt
+
+
 
 # goal tracking
 cd /data1/linsixu/HWC_Loco/legged_gym/legged_gym/scripts
@@ -470,6 +474,8 @@ CUDA_VISIBLE_DEVICES=2 python play.py goal_tracking_v2 \
   --checkpoint 20000 \
   --record_video \
   --headless
+
+
 
 # recovery
 cd /data1/linsixu/HWC_Loco/legged_gym/legged_gym/scripts

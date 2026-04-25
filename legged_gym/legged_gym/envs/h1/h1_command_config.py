@@ -193,13 +193,13 @@ class H1CommandCfg( LeggedRobotCfg ):
         lower_stand = { # = target angles [rad] when action = 0.0
            'left_hip_yaw_joint' : 0. ,   
            'left_hip_roll_joint' : 0,               
-           'left_hip_pitch_joint' : -0.25,         
-           'left_knee_joint' : 0.55,       
+           'left_hip_pitch_joint' : -0.30,         
+           'left_knee_joint' : 0.65,       
            'left_ankle_joint' : -0.2,
            'right_hip_yaw_joint' : 0., 
            'right_hip_roll_joint' : 0, 
-           'right_hip_pitch_joint' : -0.25,                                       
-           'right_knee_joint' : 0.55,                                             
+           'right_hip_pitch_joint' : -0.30,                                       
+           'right_knee_joint' : 0.65,                                             
            'right_ankle_joint' : -0.2,
            'torso_joint' : 0., 
            'left_shoulder_pitch_joint' : 0.1, 
@@ -276,6 +276,7 @@ class H1CommandCfg( LeggedRobotCfg ):
 
         # joint indices
         hip_joints = ["left_hip_roll_joint", "left_hip_pitch_joint", "left_hip_yaw_joint", "right_hip_roll_joint", "right_hip_pitch_joint", "right_hip_yaw_joint"]
+        # hip_joints = ["left_hip_roll_joint", "left_hip_yaw_joint", "right_hip_roll_joint", "right_hip_yaw_joint"]
         knee_joints = ['left_knee_joint', 'right_knee_joint']
         ankle_joints = ["left_ankle_joint", "right_ankle_joint"]
         shoulder_joints = ['left_shoulder_roll_joint', 'left_shoulder_pitch_joint', 'left_shoulder_yaw_joint',
@@ -355,13 +356,12 @@ class H1CommandCfg( LeggedRobotCfg ):
                 feet_distance = 0.2
                 knee_distance = 0.2
                 
-                lower_stand = -0.3
-
-                # shoulder_pos = -0.5  # -1.0 
-                # elbow_pos = -0.5 # -1.0
-                # waist_pos = -1.0  # -1.0
-                # hip_pos = -1.0   # -5.0
-                # base_height = 1.0
+                lower_stand = -0.2
+                shoulder_pos = -0.5  # -1.0 
+                elbow_pos = -0.5 # -1.0
+                waist_pos = -1.0  # -1.0
+                hip_pos = -1.0   # -5.0
+                # base_height = 0.4
 
                 orientation = -2.0
 
@@ -533,7 +533,8 @@ class H1CommandCfg( LeggedRobotCfg ):
         # Use a geometric support polygon derived from the H1 model instead of a
         # hand-tuned center-distance threshold.
         stability_margin_threshold = 0.0
-        use_zmp_cost = task.motion_task == 'recovery'
+        # use_zmp_cost = task.motion_task == 'recovery'
+        use_zmp_cost = False
         zmp_cost_type = "margin"
         zmp_no_contact_cost = 0.0
         if task.motion_task == 'walk':

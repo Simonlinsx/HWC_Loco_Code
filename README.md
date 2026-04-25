@@ -4,8 +4,6 @@
 
 HWC-Loco is a research codebase for humanoid locomotion with motion-driven low-level control, recovery control, and a learned high-level selector policy. The repository contains Isaac Gym training code, motion preprocessing and retargeting utilities, and MuJoCo sim-to-sim deployment scripts.
 
-The current release is centered on Unitree H1, with partial support for G1 in the environment and deployment code.
-
 ![Pipeline](Pipeline.png)
 
 ## Highlights
