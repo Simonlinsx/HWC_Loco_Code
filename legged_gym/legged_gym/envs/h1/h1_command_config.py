@@ -533,8 +533,8 @@ class H1CommandCfg( LeggedRobotCfg ):
         # Use a geometric support polygon derived from the H1 model instead of a
         # hand-tuned center-distance threshold.
         stability_margin_threshold = 0.0
-        # use_zmp_cost = task.motion_task == 'recovery'
-        use_zmp_cost = False
+        use_zmp_cost = task.motion_task == 'recovery'
+        # use_zmp_cost = False
         zmp_cost_type = "margin"
         zmp_no_contact_cost = 0.0
         if task.motion_task == 'walk':
