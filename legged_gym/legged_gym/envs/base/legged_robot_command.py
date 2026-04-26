@@ -215,7 +215,6 @@ class LeggedRobot_command(BaseTask):
         """ Check if environments need to be reset
         """
 
-        print('222222')
         self.reset_buf = torch.any(torch.norm(self.contact_forces[:, self.termination_contact_indices, :], dim=-1) > 1., dim=1)
         # roll_cutoff = torch.abs(self.roll) > 1.0
         # pitch_cutoff = torch.abs(self.pitch) > 1.0
@@ -266,7 +265,7 @@ class LeggedRobot_command(BaseTask):
         self.last_root_vel[:] = 0.
         self.feet_air_time[env_ids] = 0.
         self.reset_buf[env_ids] = 1
-        self.obs_history_buf[env_ids, :, :] = 0.  # reset obs history buffer TODO no 0s
+        self.obs_history_buf[env_ids, :, :] = 0.  # reset observation history buffer
         self.contact_buf[env_ids, :, :] = 0.
         self.action_history_buf[env_ids, :, :] = 0.
         # self.cur_goal_idx[env_ids] = 0
@@ -327,7 +326,6 @@ class LeggedRobot_command(BaseTask):
                             self.reindex(self.action_history_buf[:, -1]),
                             self.reindex_feet(self.contact_filt.float()*0-0.5),
                             ),dim=-1)
-        # import ipdb; ipdb.set_trace()
         priv_explicit = torch.cat((self.base_lin_vel * self.obs_scales.lin_vel,
                                    0 * self.base_lin_vel,
                                    0 * self.base_lin_vel), dim=-1)
@@ -461,14 +459,11 @@ class LeggedRobot_command(BaseTask):
             self.dof_pos_limits = torch.zeros(self.num_dof, 2, dtype=torch.float, device=self.device, requires_grad=False)
             self.dof_vel_limits = torch.zeros(self.num_dof, dtype=torch.float, device=self.device, requires_grad=False)
             self.torque_limits = torch.zeros(self.num_dof, dtype=torch.float, device=self.device, requires_grad=False)
-            print('1')
             for i in range(len(props)):
                 self.dof_pos_limits[i, 0] = props["lower"][i].item() * self.cfg.safety.pos_limit
                 self.dof_pos_limits[i, 1] = props["upper"][i].item() * self.cfg.safety.pos_limit
                 self.dof_vel_limits[i] = props["velocity"][i].item() * self.cfg.safety.vel_limit
                 self.torque_limits[i] = props["effort"][i].item() * self.cfg.safety.torque_limit
-                print(self.torque_limits[i])
-            print('2')
                 
         return props
 
@@ -601,11 +596,11 @@ class LeggedRobot_command(BaseTask):
         actions_scaled = actions * self.cfg.control.action_scale
         control_type = self.cfg.control.control_type
         if control_type=="P":
-            # if not self.cfg.domain_rand.randomize_motor:  # TODO add strength to gain directly
+            # if not self.cfg.domain_rand.randomize_motor:  # motor strength is applied to gains directly when randomization is disabled
             #     torques = self._kp_scale * self.p_gains * (actions_scaled + self.default_dof_pos_all - self.dof_pos) - self._kd_scale * self.d_gains*self.dof_vel
             # else:
             #     torques = self.motor_strength[0] * self._kp_scale * self.p_gains*(actions_scaled + self.default_dof_pos_all - self.dof_pos) - self.motor_strength[1] * self._kd_scale * self.d_gains * self.dof_vel
-            if not self.cfg.domain_rand.randomize_motor:  # TODO add strength to gain directly
+            if not self.cfg.domain_rand.randomize_motor:  # motor strength is applied to gains directly when randomization is disabled
                 torques = self._kp_scale * self.p_gains * (actions_scaled + self.default_dof_pos - self.dof_pos) - self._kd_scale * self.d_gains*self.dof_vel
             else:
                 torques = self.motor_strength[0] * self._kp_scale * self.p_gains*(actions_scaled + self.default_dof_pos - self.dof_pos) - self.motor_strength[1] * self._kd_scale * self.d_gains * self.dof_vel
@@ -831,7 +826,7 @@ class LeggedRobot_command(BaseTask):
 
         self.commands = torch.zeros(self.num_envs, self.cfg.commands.num_commands, dtype=torch.float, device=self.device, requires_grad=False) # x vel, y vel, yaw vel, heading
         self._resample_commands(torch.arange(self.num_envs, device=self.device, requires_grad=False))
-        self.commands_scale = torch.tensor([self.obs_scales.lin_vel, self.obs_scales.lin_vel, self.obs_scales.ang_vel], device=self.device, requires_grad=False,) # TODO change this
+        self.commands_scale = torch.tensor([self.obs_scales.lin_vel, self.obs_scales.lin_vel, self.obs_scales.ang_vel], device=self.device, requires_grad=False,) # command scale for velocity commands
         self.feet_air_time = torch.zeros(self.num_envs, self.feet_indices.shape[0], dtype=torch.float, device=self.device, requires_grad=False)
         self.last_contacts = torch.zeros(self.num_envs, len(self.feet_indices), dtype=torch.bool, device=self.device, requires_grad=False)
         self.base_lin_vel = quat_rotate_inverse(self.base_quat, self.root_states[:, 7:10])

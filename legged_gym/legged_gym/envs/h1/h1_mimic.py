@@ -296,7 +296,6 @@ class H1Mimic(LeggedRobot):
 
         # 3 + 3 + 1 + 1 + 19 + 19 + 3  = 49 
         # [base_lin_vel, env.base_ang_vel, torch.stack((env.roll, env.pitch), dim = 1), env.dof_pos, env.dof_vel, env.commands[:, :3]]
-        # self.extreme_data = np.load("/home/simon/expressive-humanoid/legged_gym/legged_gym/scripts/extrem_data.npy", allow_pickle=True)
 
         batch_size = len(env_ids)
         indices = np.random.choice(len(self.extreme_data), batch_size, replace=False)
@@ -431,7 +430,7 @@ class H1Mimic(LeggedRobot):
         self.last_root_vel[:] = 0.
         self.feet_air_time[env_ids] = 0.
         self.reset_buf[env_ids] = 1
-        self.obs_history_buf[env_ids, :, :] = 0.  # reset obs history buffer TODO no 0s
+        self.obs_history_buf[env_ids, :, :] = 0.  # reset observation history buffer
         self.contact_buf[env_ids, :, :] = 0.
         self.action_history_buf[env_ids, :, :] = 0.
         # self.cur_goal_idx[env_ids] = 0

@@ -106,7 +106,7 @@ class TaskRegistry():
         """ Creates the training algorithm  either from a registered namme or from the provided config file.
 
         Args:
-            env (isaacgym.VecTaskPython): The environment to train (TODO: remove from within the algorithm)
+            env (isaacgym.VecTaskPython): The environment to train
             name (string, optional): Name of a registered env. If None, the config file will be used instead. Defaults to None.
             args (Args, optional): Isaac Gym comand line arguments. If None get_args() will be called. Defaults to None.
             train_cfg (Dict, optional): Training config file. If None 'name' will be used to get the config file. Defaults to None.
@@ -156,11 +156,12 @@ class TaskRegistry():
         #save resume path before creating a new log_dir
         resume = train_cfg.runner.resume
         if args.resumeid:
-            # log_root = LEGGED_GYM_ROOT_DIR + f"/logs/{args.proj_name}/" + args.resumeid
             if "g1" in args.task:
-                log_root = "/home/sixu/code/HWC_Loco/legged_gym/logs/g1/" + args.resumeid
-            if "h1" in args.task:
-                log_root = "/home/sixu/code/HWC_Loco/legged_gym/logs/h1/" + args.resumeid
+                log_root = os.path.join(LEGGED_GYM_ROOT_DIR, "logs", "g1", args.resumeid)
+            elif "h1" in args.task:
+                log_root = os.path.join(LEGGED_GYM_ROOT_DIR, "logs", "h1", args.resumeid)
+            else:
+                log_root = os.path.join(LEGGED_GYM_ROOT_DIR, "logs", train_cfg.runner.experiment_name, args.resumeid)
             resume = True
         if resume:
             # load previously trained model

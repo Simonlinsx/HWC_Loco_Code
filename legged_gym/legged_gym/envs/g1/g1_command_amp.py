@@ -266,9 +266,6 @@ class G1CommandAMP(G1Command):
         else:
             assert cfg.motion.motion_type == "yaml"
             motion_file = os.path.join(ASE_DIR, f"ase/poselib/data/configs/{cfg.motion.motion_name}")
-
-        # motion_file = '/mnt/data1/zhaohaoyu/Whole-body-control-main/ASE/ase/poselib/data/configs/motions_autogen_all_no_run_jump_g1.yaml'
-        # motion_file = '/mnt/data1/zhaohaoyu/Whole-body-control-main/ASE/ase/poselib/data/configs/motions_debug_g1.yaml'
         # print('cfg.motion.motion_name',cfg.motion.motion_name)
         # print('motion_file',motion_file)
         self._load_motion(motion_file, cfg.motion.no_keybody)

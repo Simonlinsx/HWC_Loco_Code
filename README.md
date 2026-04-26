@@ -2,7 +2,7 @@
 
 [Project Page](https://simonlinsx.github.io/HWC_Loco/) | [Paper](https://arxiv.org/abs/2503.00923) | [PDF](https://arxiv.org/pdf/2503.00923)
 
-HWC-Loco is a research codebase for humanoid locomotion with motion-driven low-level control, recovery control, and a learned high-level selector policy. The repository contains Isaac Gym training code, motion preprocessing and retargeting utilities, and MuJoCo sim-to-sim deployment scripts.
+HWC-Loco is a research codebase for humanoid locomotion with motion-driven low-level control, recovery control, and a learned high-level selector policy.
 
 ![Pipeline](Pipeline.png)
 
@@ -12,7 +12,6 @@ HWC-Loco is a research codebase for humanoid locomotion with motion-driven low-l
 - Separate low-level locomotion and recovery policies
 - High-level selector policy for switching between behaviors
 - Motion preprocessing and retargeting utilities built on top of `ASE/poselib`
-- MuJoCo sim-to-sim deployment scripts
 
 ## Repository Structure
 
@@ -21,11 +20,10 @@ HWC_Loco/
 ├── ASE/                # motion preprocessing, retargeting, and ASE-based utilities
 ├── legged_gym/         # humanoid environments, training, evaluation, and export scripts
 ├── rsl_rl/             # PPO implementations and training runners
-├── mujoco/             # MuJoCo deployment scripts and configs
 ├── Pipeline.png        # overview figure
 ├── usage.md            # internal experiment notes and command history
-├── req.yaml            # local pip snapshot
-└── environment.yaml    # local conda environment snapshot
+├── req.yaml            # pip dependency snapshot for the public release
+└── environment.yaml    # conda environment for the public release
 ```
 
 ## Requirements
@@ -35,35 +33,30 @@ This project is developed for:
 - Linux
 - Python 3.8
 - NVIDIA GPU
-- CUDA-compatible PyTorch
+- CUDA-compatible PyTorch 2.3.1
 - Isaac Gym Preview 4
 
-Recommended base versions:
+The checked local environment uses:
 
 - `python==3.8`
-- `torch==1.10.0+cu113`
-- `torchvision==0.11.1+cu113`
-- `torchaudio==0.10.0+cu113`
+- `torch==2.3.1+cu121`
+- `torchvision==0.18.1`
+- `torchaudio==2.3.1`
+- `numpy==1.23.5`
 
 Notes:
 
-- `environment.yaml` is a local development snapshot and should not be treated as the final public reproduction environment without cleanup.
+- `environment.yaml` is a cleaned environment exported from the local `hwc-loco` setup.
+- After activating the conda environment, set `LD_LIBRARY_PATH` so Isaac Gym can find the conda runtime libraries.
 - Raw motion preprocessing from `.fbx` files additionally requires the Autodesk FBX SDK.
 
 ## Installation
 
-Create a clean environment:
+Create and activate the conda environment:
 
 ```bash
-conda create -n hwc_loco python=3.8
-conda activate hwc_loco
-```
-
-Install PyTorch:
-
-```bash
-pip install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu113 \
-  -f https://download.pytorch.org/whl/cu113/torch_stable.html
+conda env create -f environment.yaml
+conda activate hwc-loco
 ```
 
 Install Isaac Gym Preview 4 manually from NVIDIA, then install its Python package:
@@ -87,15 +80,13 @@ cd ..
 Install additional dependencies:
 
 ```bash
-pip install -r ASE/requirements.txt
 pip install -r legged_gym/requirements.txt
-pip install mujoco==3.2.3 gdown dill flask ipdb pyfqmr
 ```
 
-If you do not want online logging during training, add:
+The standalone ASE runner has extra optional dependencies. Install them only if you need to run `ASE/ase/run.py` directly:
 
 ```bash
---no_wandb
+pip install -r ASE/requirements.txt
 ```
 
 ## Motion Data Preparation
@@ -161,7 +152,6 @@ python train.py goal_tracking \
   --motion_type yaml \
   --sim_device cuda:0 \
   --rl_device cuda:0 \
-  --seed 42 \
   --headless \
   --proj_name h1
 ```
@@ -176,7 +166,6 @@ python train.py recovery \
   --motion_type yaml \
   --sim_device cuda:0 \
   --rl_device cuda:0 \
-  --seed 42 \
   --headless \
   --proj_name h1
 ```
@@ -252,55 +241,26 @@ python play_selector_jit.py selector_eval \
   --reco_jit <RECOVERY_JIT_PATH>
 ```
 
-## MuJoCo Sim-to-Sim
+<!-- ## License and Asset Notice
 
-MuJoCo deployment utilities are provided in `mujoco/`.
-
-Install MuJoCo:
-
-```bash
-pip install mujoco==3.2.3
-```
-
-Run deployment:
-
-```bash
-cd mujoco
-python mujoco_deploy_g1.py
-cd ..
-```
-
-Before running sim-to-sim, update the policy path in the MuJoCo config file to point to the exported model.
-
-## Reproducibility Notes
-
-This repository was developed through active research iteration. Before claiming full reproduction support, users should be aware that:
-
-- simulator, CUDA, and PyTorch versions matter
-- raw motion preprocessing depends on the FBX SDK
-- `usage.md` reflects development-time experiment history rather than a polished release tutorial
-- public reproduction may require adapting environment details to the target machine
-
-## License and Asset Notice
-
-This repository contains components and assets under different licenses.
+This repository contains code and assets from multiple third-party sources. Each third-party component is subject to its own license.
 
 - `legged_gym/` and `rsl_rl/` contain BSD-style licensed components
 - `ASE/` includes code released under the NVIDIA license in `ASE/LICENSE.txt`, which restricts usage to non-commercial research or evaluation
 - bundled motion assets under `ASE/ase/data/motions/reallusion_sword_shield/` are marked for non-commercial use only
 - additional robot description assets may carry their own licenses in their respective subdirectories
 
-Please read all relevant license files before using, redistributing, or modifying this repository.
+Please read all relevant license files before using, redistributing, or modifying this repository or any derived models. Unless otherwise specified, this release is intended for non-commercial research use. -->
 
-## Acknowledgements
+## Acknowledgement
 
-This project builds on top of several excellent open-source and research codebases, including:
+This project builds upon and is inspired by several excellent open-source and research codebases, including:
 
-- `legged_gym`
-- `rsl_rl`
-- `ASE`
-- MuJoCo
-- Unitree robot description assets
+- `legged_gym` and `rsl_rl` for legged robot reinforcement learning infrastructure
+- `ASE` and `poselib` for motion processing and adversarial motion prior utilities
+- ExBody-style humanoid imitation and control pipelines
+- Unitree H1/G1 robot description assets
+- CMU motion capture data and other motion assets used for retargeting
 
 We thank the original authors and maintainers of these projects.
 

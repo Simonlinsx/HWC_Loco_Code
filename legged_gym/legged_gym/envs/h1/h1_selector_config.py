@@ -493,7 +493,7 @@ class H1SelectorCfg( LeggedRobotCfg ):
         curriculum = False
         max_curriculum = 1.
         num_commands = 4 # default: lin_vel_x, lin_vel_y, ang_vel_yaw, heading (in heading mode ang_vel_yaw is recomputed from heading error)
-        resampling_time = 10. # time before command are changed[s]  11.1  TODO default 6.
+        resampling_time = 10. # time before commands are resampled [s]
         heading_command = False # True   if true: compute ang vel command from heading error
 
         lin_vel_clip = 0.1     # default 0.2

@@ -50,11 +50,10 @@ import isaacgym
 from legged_gym import LEGGED_GYM_ROOT_DIR
 from legged_gym.envs import *
 from legged_gym.utils import get_args, task_registry
-from shutil import copyfile
 import torch
 import wandb
 
-import random  # 添加随机模块
+import random
 
 def set_random_seed(seed):
     """
@@ -65,12 +64,13 @@ def set_random_seed(seed):
     random.seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)  # 如果使用多GPU
+        torch.cuda.manual_seed_all(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
 
 
 def train(args):
-    random_seed = args.seed if hasattr(args, 'seed') else 42  # 默认种子为 42
+    random_seed = args.seed if getattr(args, "seed", None) is not None else 42
+    args.seed = random_seed
     set_random_seed(random_seed)
     print(f"Random seed set to: {random_seed}")
 
@@ -93,14 +93,13 @@ def train(args):
     if args.no_wandb:
         mode = "disabled"
 
-    # mode = "disabled"
-    wandb.init(project=args.proj_name, name=args.exptid, entity=args.entity, mode=mode, dir="../../logs")
-    # wandb.save(LEGGED_GYM_ENVS_DIR + "/base/legged_robot_config.py", policy="now")
-    # wandb.save(LEGGED_GYM_ENVS_DIR + "/base/legged_robot.py", policy="now")
-    # wandb.save(LEGGED_GYM_ENVS_DIR + "/h1/h1_mimic_config.py", policy="now")
-    # wandb.save(LEGGED_GYM_ENVS_DIR + "/h1/h1_mimic.py", policy="now")
-
-        # wandb.save(LEGGED_GYM_ENVS_DIR + "/h1/h1_mimic.py", policy="now")
+    wandb.init(
+        project=args.proj_name,
+        name=args.exptid,
+        entity=args.entity if args.entity else None,
+        mode=mode,
+        dir=os.path.join(LEGGED_GYM_ROOT_DIR, "logs"),
+    )
 
     env, env_cfg = task_registry.make_env(name=args.task, args=args)
     RLTrainer, train_cfg = task_registry.make_alg_runner(log_root = log_pth, env=env, name=args.task, args=args)

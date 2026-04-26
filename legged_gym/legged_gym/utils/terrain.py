@@ -531,7 +531,6 @@ def parkour_step_terrain(terrain,
         last_dis_x = dis_x
         goals[i+1] = [dis_x-rand_x//2, mid_y+rand_y]
     final_dis_x = dis_x + np.random.randint(dis_x_min, dis_x_max)
-    # import ipdb; ipdb.set_trace()
     if final_dis_x > terrain.width:
         final_dis_x = terrain.width - 0.5 // terrain.horizontal_scale
     goals[-1] = [final_dis_x, mid_y]

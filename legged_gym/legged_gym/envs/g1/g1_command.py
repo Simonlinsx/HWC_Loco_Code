@@ -202,9 +202,6 @@ class G1Command(LeggedRobot_command):
         else:
             assert cfg.motion.motion_type == "yaml"
             motion_file = os.path.join(ASE_DIR, f"ase/poselib/data/configs/{cfg.motion.motion_name}")
-
-        # motion_file = '/mnt/data1/zhaohaoyu/Whole-body-control-main/ASE/ase/poselib/data/configs/motions_autogen_all_no_run_jump_g1.yaml'
-        # motion_file = '/mnt/data1/zhaohaoyu/Whole-body-control-main/ASE/ase/poselib/data/configs/motions_debug_g1.yaml'
         # print('cfg.motion.motion_name',cfg.motion.motion_name)
         # print('motion_file',motion_file)
         self._load_motion(motion_file, cfg.motion.no_keybody)
@@ -260,7 +257,6 @@ class G1Command(LeggedRobot_command):
             total_mass +=mass
 
         total_mass = total_mass.view(self.num_envs, 1)  # Shape: [num_envs, 1]
-        # breakpoint()
         
         # The position of the central mass
         self.com_pos = torch.cat(
@@ -431,7 +427,6 @@ class G1Command(LeggedRobot_command):
 
         # 3 + 3 + 1 + 1 + 19 + 19 + 3  = 49 
         # [base_lin_vel, env.base_ang_vel, torch.stack((env.roll, env.pitch), dim = 1), env.dof_pos, env.dof_vel, env.commands[:, :3]]
-        # self.extreme_data = np.load("/home/simon/expressive-humanoid/legged_gym/legged_gym/scripts/extrem_data.npy", allow_pickle=True)
 
         batch_size = len(env_ids)
         indices = np.random.choice(len(self.extreme_data), batch_size, replace=False)
@@ -503,7 +498,7 @@ class G1Command(LeggedRobot_command):
         self.last_root_vel[:] = 0.
         self.feet_air_time[env_ids] = 0.
         self.reset_buf[env_ids] = 1
-        self.obs_history_buf[env_ids, :, :] = 0.  # reset obs history buffer TODO no 0s
+        self.obs_history_buf[env_ids, :, :] = 0.  # reset observation history buffer
         self.action_history_buf[env_ids, :, :] = 0.
         # fill extras
         self.extras["episode"] = {}
@@ -936,7 +931,7 @@ class G1Command(LeggedRobot_command):
         # max_df = self.cfg.rewards.max_dist / 2
         # d_min = torch.clamp(elbow_dist - fd, -0.5, 0.)
         # d_max = torch.clamp(elbow_dist - max_df, 0, 0.5)
-        # TODO need to change to 0.45?
+
         rew = torch.minimum(elbow_dist, torch.tensor(0.40, device=self.device))
         return rew
 
@@ -1348,4 +1343,3 @@ def global_to_local_xy(yaw, global_pos_delta):
     rotation_matrices = torch.stack([cos_yaw, sin_yaw, -sin_yaw, cos_yaw], dim=2).view(-1, 2, 2)
     local_pos_delta = torch.bmm(rotation_matrices, global_pos_delta.unsqueeze(-1))
     return local_pos_delta.squeeze(-1)
-

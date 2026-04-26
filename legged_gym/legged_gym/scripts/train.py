@@ -31,10 +31,6 @@
 import numpy as np
 import argparse
 import os
-from datetime import datetime
-
-# import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '4'  # 仅使用GPU 0
 
 _MOTION_TASK_ENV_VAR = "LEGGED_GYM_MOTION_TASK"
 
@@ -50,12 +46,12 @@ def _apply_motion_task_cli_override():
 _apply_motion_task_cli_override()
 
 import isaacgym
+from legged_gym import LEGGED_GYM_ROOT_DIR
 from legged_gym.envs import *
 from legged_gym.utils import get_args, task_registry
-from shutil import copyfile
 import torch
 import wandb
-import random  # 添加随机模块
+import random
 
 def set_random_seed(seed):
     """
@@ -66,25 +62,23 @@ def set_random_seed(seed):
     random.seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)  # 如果使用多GPU
+        torch.cuda.manual_seed_all(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
 
 def train(args):
-    random_seed = args.seed if hasattr(args, 'seed') else 42  # 默认种子为 42
+    random_seed = args.seed if getattr(args, "seed", None) is not None else 42
+    args.seed = random_seed
     set_random_seed(random_seed)
     print(f"Random seed set to: {random_seed}")
 
-    # args.headless = True
-    # log_pth = LEGGED_GYM_ROOT_DIR + "/logs/{}/".format(args.proj_name) + args.exptid
     if "g1" in args.task:
-        log_pth = "/data1/linsixu/HWC_Loco/legged_gym/logs/g1/" + args.exptid
-    if "h1" in args.task:
-        log_pth = "/data1/linsixu/HWC_Loco/legged_gym/logs/h1/" + args.exptid
+        log_pth = os.path.join(LEGGED_GYM_ROOT_DIR, "logs", "g1", args.exptid)
+    elif "h1" in args.task:
+        log_pth = os.path.join(LEGGED_GYM_ROOT_DIR, "logs", "h1", args.exptid)
+    else:
+        log_pth = os.path.join(LEGGED_GYM_ROOT_DIR, "logs", args.proj_name, args.exptid)
 
-    try:
-        os.makedirs(log_pth)
-    except:
-        pass
+    os.makedirs(log_pth, exist_ok=True)
     if args.debug:
         mode = "disabled"
         args.rows = 10
@@ -96,10 +90,13 @@ def train(args):
     if args.no_wandb:
         mode = "disabled"
 
-    # mode = "disabled"
-    wandb.init(project=args.proj_name, name=args.exptid, 
-    # entity=args.entity, 
-    mode=mode, dir="../../logs")
+    wandb.init(
+        project=args.proj_name,
+        name=args.exptid,
+        entity=args.entity if args.entity else None,
+        mode=mode,
+        dir=os.path.join(LEGGED_GYM_ROOT_DIR, "logs"),
+    )
 
     env, env_cfg = task_registry.make_env(name=args.task, args=args)
     ppo_runner, train_cfg = task_registry.make_alg_runner(log_root = log_pth, env=env, name=args.task, args=args)
@@ -109,9 +106,7 @@ if __name__ == '__main__':
     # Log configs immediately
     args = get_args()
 
-    if not hasattr(args, 'seed'):
-        args.seed = 42  # 设置默认随机种子
+    if getattr(args, "seed", None) is None:
+        args.seed = 42
         
     train(args)
-    
-# nohup python train.py goal_tracking_nips_refined3_4.0 --task h1_command_amp --motion_name motions_autogen_human_walk_and_run.yaml --motion_type yaml --device cuda:7 --seed 45 > goal_tracking_nips_refined3_4.0.log 2>&1 &

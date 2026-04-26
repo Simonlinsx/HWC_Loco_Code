@@ -175,9 +175,6 @@ class G1Mimic(LeggedRobot):
         else:
             assert cfg.motion.motion_type == "yaml"
             motion_file = os.path.join(ASE_DIR, f"ase/poselib/data/configs/{cfg.motion.motion_name}")
-
-        # motion_file = '/mnt/data1/zhaohaoyu/Whole-body-control-main/ASE/ase/poselib/data/configs/motions_autogen_all_no_run_jump_g1.yaml'
-        # motion_file = '/mnt/data1/zhaohaoyu/Whole-body-control-main/ASE/ase/poselib/data/configs/motions_debug_g1.yaml'
         print('cfg.motion.motion_name',cfg.motion.motion_name)
         print('motion_file',motion_file)
         self._load_motion(motion_file, cfg.motion.no_keybody)
@@ -441,7 +438,7 @@ class G1Mimic(LeggedRobot):
         self.last_root_vel[:] = 0.
         self.feet_air_time[env_ids] = 0.
         self.reset_buf[env_ids] = 1
-        self.obs_history_buf[env_ids, :, :] = 0.  # reset obs history buffer TODO no 0s
+        self.obs_history_buf[env_ids, :, :] = 0.  # reset observation history buffer
         self.contact_buf[env_ids, :, :] = 0.
         self.action_history_buf[env_ids, :, :] = 0.
         # self.cur_goal_idx[env_ids] = 0

@@ -116,7 +116,6 @@ class ActionFilter(object):
     y = np.multiply(x, self.b[:, 0]) + np.sum(
         np.multiply(xs, self.b[:, 1:]), axis=-1) - np.sum(
             np.multiply(ys, self.a[:, 1:]), axis=-1)
-    # import pdb; pdb.set_trace()
     self.xhist.appendleft(x.reshape((self.num_joints, 1)).copy())
     self.yhist.appendleft(y.reshape((self.num_joints, 1)).copy())
     return y
@@ -154,7 +153,6 @@ class ActionFilterButter(ActionFilter):
       order: filter order
       num_joints: robot DOF
     """
-    # import pdb; pdb.set_trace()
     self.lowcut = ([float(x) for x in lowcut]
                    if lowcut is not None else [ACTION_FILTER_LOW_CUT])
     self.highcut = ([float(x) for x in highcut]

@@ -534,7 +534,6 @@ class H1CommandCfg( LeggedRobotCfg ):
         # hand-tuned center-distance threshold.
         stability_margin_threshold = 0.0
         use_zmp_cost = task.motion_task == 'recovery'
-        # use_zmp_cost = False
         zmp_cost_type = "margin"
         zmp_no_contact_cost = 0.0
         if task.motion_task == 'walk':
@@ -688,7 +687,7 @@ class H1CommandCfg( LeggedRobotCfg ):
         curriculum = task.motion_task == 'recovery'
         max_curriculum = 1.
         num_commands = 4 # default: lin_vel_x, lin_vel_y, ang_vel_yaw, heading (in heading mode ang_vel_yaw is recomputed from heading error)
-        resampling_time = 10. # time before command are changed[s]  11.1  TODO default 6.
+        resampling_time = 10. # time before commands are resampled [s]
         if task.motion_task == 'recovery':
             resampling_time = 100.
         recovery_command_curriculum_steps = 24 * 5000

@@ -67,9 +67,6 @@ from .h1.h1_mimic_eval import H1MimicEval
 from .h1.h1_command import H1Command
 from .h1.h1_command_amp import H1CommandAMP
 
-import os
-import ipdb
-
 from legged_gym.utils.task_registry import task_registry
 
 # task_registry.register( "anymal_c_rough", Anymal, AnymalCRoughCfg(), AnymalCRoughCfgPPO() )

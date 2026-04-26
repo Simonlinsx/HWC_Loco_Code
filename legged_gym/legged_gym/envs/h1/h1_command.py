@@ -674,7 +674,6 @@ class H1Command(LeggedRobot_command):
             total_mass +=mass
 
         total_mass = total_mass.view(self.num_envs, 1)  # Shape: [num_envs, 1]
-        # breakpoint()
         
         # The position of the central mass
         self.com_pos = torch.cat(
@@ -868,7 +867,6 @@ class H1Command(LeggedRobot_command):
 
         # 3 + 3 + 1 + 1 + 19 + 19 + 3  = 49 
         # [base_lin_vel, env.base_ang_vel, torch.stack((env.roll, env.pitch), dim = 1), env.dof_pos, env.dof_vel, env.commands[:, :3]]
-        # self.extreme_data = np.load("/home/simon/expressive-humanoid/legged_gym/legged_gym/scripts/extrem_data.npy", allow_pickle=True)
 
         batch_size = len(env_ids)
         indices = np.random.choice(len(self.extreme_data), batch_size, replace=False)
@@ -949,7 +947,7 @@ class H1Command(LeggedRobot_command):
         self.cost_buf[env_ids] = 0.
         self.feet_air_time[env_ids] = 0.
         self.reset_buf[env_ids] = 1
-        self.obs_history_buf[env_ids, :, :] = 0.  # reset obs history buffer TODO no 0s
+        self.obs_history_buf[env_ids, :, :] = 0.  # reset observation history buffer
         self.contact_buf[env_ids, :, :] = 0.
         self.action_history_buf[env_ids, :, :] = 0.
         # self.cur_goal_idx[env_ids] = 0
@@ -1203,7 +1201,6 @@ class H1Command(LeggedRobot_command):
         # contact_mask = self.contact_forces[:, self.feet_indices, 2] > 5.
 
         # ZMP was already refreshed in compute_reward() for the current post-step.
-        # breakpoint()
         # print("zmp_distance", self.zmp_distance.mean())
 
         # print(self.cfg.env.prop_hist_len)
@@ -1541,9 +1538,8 @@ class H1Command(LeggedRobot_command):
         return reward
 
     def _reward_lower_stand(self):
-        # Use a recovery-specific lower-body posture prior that keeps some knee
-        # flexion for disturbance rejection without collapsing into a deep crouch.
-        return torch.sum(torch.square(self.dof_pos - self.lower_pos), dim=1)
+        # Penalize deviation from the nominal standing posture.
+        return torch.sum(torch.square(self.dof_pos - self.default_dof_pos), dim=1)
 
     def _reward_base_height(self):
         """

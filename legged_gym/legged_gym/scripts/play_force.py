@@ -358,8 +358,6 @@ def play(args):
         # vel_error = torch.abs(vel[:, :3] - ground_truth[:, :3]).mean()
         # zmp_error = torch.abs(vel[:, 3:7] - ground_truth[:, 3:7]).mean()
         # zmp_error = torch.abs(vel[:, 3:5] - ground_truth[:, 3:5]).mean()
-
-        # breakpoint()
         # print("vel_error", vel_error)
         # print("zmp_error", zmp_error)
         # if vel_error.item() > 10.0:

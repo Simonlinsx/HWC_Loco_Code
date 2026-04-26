@@ -63,6 +63,15 @@ def get_load_path(root, load_run=-1, checkpoint=-1, model_name_include="jit"):
     return model, checkpoint
 
 
+def _require_path(path_value, arg_name):
+    if not path_value:
+        raise ValueError(f"Please provide {arg_name}.")
+    path = os.path.abspath(path_value)
+    if not os.path.isfile(path):
+        raise FileNotFoundError(f"{arg_name} not found: {path}")
+    return path
+
+
 def compute_kl_divergence(p_obs, q_demo, eps=1e-3):
     p_mean = p_obs.mean(dim=0)
     p_cov = torch.cov(p_obs.T) + eps * torch.eye(p_obs.shape[1])
@@ -279,220 +288,15 @@ def play(args):
     total_length = env_cfg.terrain.num_rows * (env_cfg.terrain.terrain_length + 2 * env_cfg.terrain.border_size)
     total_width = env_cfg.terrain.num_cols * (env_cfg.terrain.terrain_width + 2 * env_cfg.terrain.border_size)
 
-    # human_like_loss_sum = 0
-    # loco_path = '/home/simon/expressive-humanoid/legged_gym/logs/h1/walk_locomotion_test8_3_no_zmp/traced/walk_locomotion_test8_3_no_zmp_reward-39800-actor_jit.pt'
-
-
-    # loco_path = '/home/simon/expressive-humanoid/legged_gym/logs/h1/walk_locomotion_test8_3_no_zmp_reward/traced/walk_locomotion_test8_3_no_zmp_reward-39800-actor_jit.pt'
-    
-    # # test   2   no termination
-    # loco_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/2/walk_ours_real_deploy-29800-actor_jit.pt'
-    # reco_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/2/walk_recovery_real_deploy-39800-actor_jit.pt'
-
-    # selector_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/2/selector_model_5000.pt'
-
-
-    # test   3   termination = 100
-    # loco_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/3/walk_ours_real_deploy-29800-actor_jit.pt'
-    # reco_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/3/walk_recovery_real_deploy-39800-actor_jit.pt'
-
-    # selector_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/3/selector_model_5000.pt'
-
-    # # test   4    termination 50
-    # loco_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/2/walk_ours_real_deploy-29800-actor_jit.pt'
-    # reco_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/2/walk_recovery_real_deploy-39800-actor_jit.pt'
-
-    # selector_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/2/selector_model_5000.pt'
-
-    # loco_path = '/data1/sixu/selector_policy/test/nips/0.0001_2/goal_tracking-34800-actor_jit.pt'
-    # reco_path = '/data1/sixu/selector_policy/test/nips/0.0001_2/recovery-34800-actor_jit.pt'
-
-    loco_path = '/data1/sixu/selector_policy/test/nips/original/goal_tracking-34800-actor_jit.pt'
-    reco_path = '/data1/sixu/selector_policy/test/nips/original/recovery-34800-actor_jit.pt'
-
-    # loco_path = '/data1/sixu/HWC_Loco/legged_gym/logs/h1/goal_tracking/traced/goal_tracking-34800-actor_jit.pt'
-    # reco_path = '/data1/sixu/HWC_Loco/legged_gym/logs/h1/recovery/traced/recovery-34800-actor_jit.pt'
-
-    # hwc-loco-l
-    # selector_path = '/data1/sixu/selector_policy/test/nips/0.0001_2/selector_model_4000.pt'
-
-    # hwc-loco
-    selector_path = '/data1/sixu/selector_policy/test/nips/original/selector_model_10000.pt'
-
-    # hwc-loco
-    # selector_path = '/home/simon/expressive-humanoid/legged_gym/logs/change_policy/nips/0.0001_2/selector_model_10000.pt'
-    # low-freq
-
-    # Average_goal_reward tensor(1.0171, device='cuda:0')
-    # Success Rate 0.94362292051756
-    # in zmp rate tensor(0.8341, device='cuda:0')
-    # total_changes 182.50800828263164
-    # termination_sum 82
-    # termination_border_sum 61
-
-    # Average_goal_reward tensor(1.0437, device='cuda:0')
-    # Success Rate 0.9324817518248175
-    # in zmp rate tensor(0.8335, device='cuda:0')
-    # total_changes 20.5430000616470352
-    # termination_sum 96
-    # termination_border_sum 74
-
-    
-    # fix 0.2
-    # Average_goal_reward tensor(0.9348, device='cuda:0')
-    # Success Rate 0.948339483394834
-    # in zmp rate tensor(0.8122, device='cuda:0')
-    # total_changes 461.10402178391814
-    # termination_sum 84
-    # termination_border_sum 56
-
-    # fix 0.4
-    # Average_goal_reward tensor(1.0231, device='cuda:0')
-    # Success Rate 0.9454209065679926
-    # in zmp rate tensor(0.8326, device='cuda:0')
-    # total_changes 189.6710086381063
-    # termination_sum 81
-    # termination_border_sum 59
-
-    # low impulse
-    # Average_goal_reward tensor(0.9199, device='cuda:0')
-    # Success Rate 0.9560336763330215
-    # in zmp rate tensor(0.8285, device='cuda:0')
-    # total_changes 197.78200913593173
-    # total_flip_changes 84.02500365301967
-    # termination_sum 69
-    # termination_border_sum 47
-
-    # Average_goal_reward tensor(0.9527, device='cuda:0')
-    # Success Rate 0.9418819188191881
-    # in zmp rate tensor(0.8280, device='cuda:0')
-    # total_changes 5.838000254938379
-    # total_flip_changes 2.7940001391107216
-    # estimation_vel_loss tensor(0.1961, device='cuda:0')
-    # estimation_zmp_loss tensor(0.4544, device='cuda:0')
-    # termination_sum 84
-    # termination_border_sum 63
-
-    # fix 0.2
-    # Average_goal_reward tensor(0.8296, device='cuda:0')
-    # Success Rate 0.95045197740113
-    # in zmp rate tensor(0.8113, device='cuda:0')
-    # total_changes 467.6090224478394
-    # termination_sum 62
-    # termination_border_sum 42
-    
-    # fix 0.4
-    # Average_goal_reward tensor(0.9262, device='cuda:0')
-    # Success Rate 0.9580615097856477
-    # in zmp rate tensor(0.8273, device='cuda:0')
-    # total_changes 208.69700952619314
-    # termination_sum 73
-    # termination_border_sum 45
-
-    # high impulse
-    # Average_goal_reward tensor(0.8789, device='cuda:0')
-    # Success Rate 0.6520076481835564
-    # in zmp rate tensor(0.8053, device='cuda:0')
-    # total_changes 215.08300994709134
-    # termination_sum 569
-    # termination_border_sum 546
-
-    # hard code 0.2
-    # Average_goal_reward tensor(0.8024, device='cuda:0')
-    # Success Rate 0.8431372549019608
-    # in zmp rate tensor(0.7866, device='cuda:0')
-    # total_changes 465.68202187120914
-    # termination_sum 224
-    # termination_border_sum 192
-
-    # hard code 0.4
-    # Average_goal_reward tensor(0.9281, device='cuda:0')
-    # Success Rate 0.7584187408491947
-    # in zmp rate tensor(0.8124, device='cuda:0')
-    # total_changes 214.43800982646644
-    # termination_sum 366
-    # termination_border_sum 330
-
-
-    # constant
-    # Average_goal_reward tensor(0.9781, device='cuda:0')
-    # Success Rate 0.6623544631306597
-    # in zmp rate tensor(0.8214, device='cuda:0')
-    # total_changes 192.68500869348645
-    # total_flip_changes 82.03500354290009
-    # estimation_vel_loss tensor(0.1882, device='cuda:0')
-    # estimation_zmp_loss tensor(0.4556, device='cuda:0')
-    # termination_sum 546
-    # termination_border_sum 522
-
-    # Average_goal_reward tensor(1.0090, device='cuda:0')
-    # Success Rate 0.6268292682926829
-    # in zmp rate tensor(0.8241, device='cuda:0')
-    # total_changes 6.387000306509435
-    # total_flip_changes 2.935000127297826
-    # estimation_vel_loss tensor(0.1897, device='cuda:0')
-    # estimation_zmp_loss tensor(0.4614, device='cuda:0')
-    # termination_sum 640
-    # termination_border_sum 612
-
-
-    # fix 0.4
-    # Average_goal_reward tensor(0.8683, device='cuda:0')
-    # Success Rate 0.4734432234432234
-    # in zmp rate tensor(0.7914, device='cuda:0')
-    # total_changes 232.65901061706245
-    # termination_sum 1184
-    # termination_border_sum 1150
-
-
-    # Average_goal_reward tensor(1.0196, device='cuda:0')
-    # Success Rate 0.9392824287028518
-    # in zmp rate 0.0
-    # termination_sum 87
-    # termination_border_sum 66
-
-
-    # Average_goal_reward tensor(1.0182, device='cuda:0')
-    # Success Rate 0.9330275229357798
-    # in zmp rate 0.0
-    # termination_sum 90
-    # termination_border_sum 73
-
-    # hwc-loco-l
-    # Average_goal_reward tensor(1.0032, device='cuda:0')
-    # Success Rate 0.6253813300793167
-    # in zmp rate 0.0
-    # termination_sum 639
-    # termination_border_sum 614
-
-    # hwc-loco
-    # Average_goal_reward tensor(1.0532, device='cuda:0')
-    # Success Rate 0.6574550128534704
-    # in zmp rate 0.0
-    # termination_sum 556
-    # termination_border_sum 533
-
-    # zmp 0.2
-    # Average_goal_reward tensor(0.8975, device='cuda:0')
-    # Success Rate 0.7043895747599451
-    # in zmp rate 0.0
-    # termination_sum 458
-    # termination_border_sum 431
-
-    # zmp 0.3
-    # Average_goal_reward tensor(0.9546, device='cuda:0')
-    # Success Rate 0.6872920825016633
-    # in zmp rate 0.0
-    # termination_sum 503
-    # termination_border_sum 470
-
-
+    loco_path = _require_path(args.loco_jit, "--loco_jit")
+    reco_path = _require_path(args.reco_jit, "--reco_jit")
+    selector_path = _require_path(args.selector_path, "--selector_path")
 
     selector_state_dict = torch.load(selector_path, map_location=env.device)
     
     selector_input = env_cfg.env.n_feature + env_cfg.env.n_proprio + env_cfg.env.n_demo + env_cfg.env.n_decoder_out
 
-    selector = SelectorNetwork(selector_input).to(env.device)  # 替换为实际的网络类
+    selector = SelectorNetwork(selector_input).to(env.device)
     
     selector.load_state_dict(selector_state_dict)
 

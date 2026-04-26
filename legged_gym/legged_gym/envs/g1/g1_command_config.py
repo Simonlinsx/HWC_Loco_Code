@@ -404,7 +404,7 @@ class G1CommandCfg( LeggedRobotCfg ):
         curriculum = False
         max_curriculum = 1.
         num_commands = 4 # default: lin_vel_x, lin_vel_y, ang_vel_yaw, heading (in heading mode ang_vel_yaw is recomputed from heading error)
-        resampling_time = 10. # time before command are changed[s]  11.1  TODO default 6.
+        resampling_time = 10. # time before commands are resampled [s]
         if task.motion_task == 'recovery':
             resampling_time = 100.
         heading_command = False # True   if true: compute ang vel command from heading error

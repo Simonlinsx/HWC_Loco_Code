@@ -147,7 +147,7 @@ class RewardNormalizer:
         return (reward - self.running_mean) / (std + 1e-8)
 
 
-def _resolve_selector_paths(args, log_dir, default_root, default_loco_name, default_reco_name):
+def _resolve_selector_paths(args, log_dir):
     loco_path = getattr(args, "loco_jit", None) if args is not None else None
     reco_path = getattr(args, "reco_jit", None) if args is not None else None
 
@@ -155,8 +155,7 @@ def _resolve_selector_paths(args, log_dir, default_root, default_loco_name, defa
         raise ValueError("Please provide both --loco_jit and --reco_jit together for selector training.")
 
     if loco_path is None and reco_path is None:
-        loco_path = os.path.join(default_root, default_loco_name)
-        reco_path = os.path.join(default_root, default_reco_name)
+        raise ValueError("Please provide --loco_jit and --reco_jit for selector training.")
 
     loco_path = os.path.abspath(loco_path)
     reco_path = os.path.abspath(reco_path)
@@ -254,27 +253,9 @@ class Selector_Trainer:
         self.epsilon_decay = self.runner_cfg.get("selector_epsilon_decay", 0.998)
 
         args = kwargs.get("args")
-        root_path = "/data1/sixu/selector_policy/test/rebuttal/0.00002_alive"
-
-        # loco_name = "walk_locomotion_test8-19800-actor_jit.pt"
-        # reco_name = "walk_recovery_test8-19800-actor_jit.pt"
-
-        # loco_name = "walk_ours3-39800-actor_jit.pt"
-        # reco_name = "walk_recovery_no_case3-39800-actor_jit.pt"
-
-        # loco_name = "walk_ours_real4-42000-actor_jit.pt"
-        # reco_name = "walk_recovery_real4-44000-actor_jit.pt"
-
-        loco_name = "goal_tracking_demo3-34800-actor_jit.pt"
-        # reco_name = "recovery_demo3-19800-actor_jit.pt"
-        reco_name = "recovery_h1-25000-actor_jit.pt"
-        
         loco_path, reco_path, self.model_save_path = _resolve_selector_paths(
             args=args,
             log_dir=log_dir,
-            default_root=root_path,
-            default_loco_name=loco_name,
-            default_reco_name=reco_name,
         )
         print("current device is:", self.device)
         print("selector locomotion jit:", loco_path)
@@ -543,16 +524,13 @@ class Selector_Trainer:
             # 每个学习迭代结束后保存 selector 模型
             if it < 2000:
                 if (it + 1) % 500 == 0:  # 每10次迭代保存一次模型
-                    # path = "/data1/sixu/selector_policy"
                     selector_filename = f"selector_model_{it + 1}.pt"
                     self.save_selector(selector_filename)
                     # self.load_selector(selector_filename)  # 加载最新的模型
                     print(f"Selector model saved to {selector_filename}")
             else:
-                if (it + 1) % 200 == 0:  # 每10次迭代保存一次模型
-                    # path = "/data1/sixu/selector_policy"
+                if (it + 1) % 200 == 0:
                     selector_filename = f"selector_model_{it + 1}.pt"
                     self.save_selector(selector_filename)
-                    # self.load_selector(selector_filename)  # 加载最新的模型
                     print(f"Selector model saved to {selector_filename}")      
             ep_infos.clear()
