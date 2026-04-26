@@ -119,12 +119,6 @@ class BaseTask():
                 self.viewer, gymapi.KEY_A, "left_turn")
             self.gym.subscribe_viewer_keyboard_event(
                 self.viewer, gymapi.KEY_D, "right_turn")
-            # self.gym.subscribe_viewer_keyboard_event(
-            #     self.viewer, gymapi.KEY_MINUS, "prev_motion")
-            # self.gym.subscribe_viewer_keyboard_event(
-            #     self.viewer, gymapi.KEY_EQUAL, "next_motion")
-            # self.gym.subscribe_viewer_keyboard_event(
-            #     self.viewer, gymapi.KEY_R, "reset_motion")
         self.free_cam = False
         self.lookat_id = 0
         self.lookat_vec = torch.tensor([-0, 2, 1], requires_grad=False, device=self.device)
@@ -237,4 +231,3 @@ class BaseTask():
                 cam_trans = torch.tensor([p.x, p.y, p.z], requires_grad=False, device=self.device)
                 look_at_pos = self.root_states[self.lookat_id, :3].clone()
                 self.lookat_vec = cam_trans - look_at_pos
-            
